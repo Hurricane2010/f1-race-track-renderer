@@ -27,11 +27,13 @@ def get_cache_filename(year, race_name, event_type):
 def load_session(year, race_name, event_type):
     cache_file = get_cache_filename(year, race_name, event_type)
 
+    # Check cache first
     if os.path.exists(cache_file):
         with open(cache_file, "rb") as f:
             st.success("Loaded from cache ✅")
             return pickle.load(f)
 
+    # Fetch from API if not cached
     fastf1.Cache.enable_cache(CACHE_DIR)
     schedule = fastf1.get_event_schedule(year)
     race = schedule[schedule['EventName'].str.contains(race_name, case=False, na=False)]
@@ -44,6 +46,7 @@ def load_session(year, race_name, event_type):
     session = fastf1.get_session(year, round_number, event_type)
     session.load()
 
+    # Cache the session data
     with open(cache_file, "wb") as f:
         pickle.dump(session, f)
         st.success("Fetched from API and cached ✅")
@@ -151,17 +154,15 @@ def plot_track(session, driver_lap_map):
 # Initialize session state if not already initialized
 if "session" not in st.session_state:
     st.session_state.session = None
-    st.session_state.session_loaded = False  # Add flag to track if session is loaded
 
-# Load button
-if st.sidebar.button("Load Race Session") and not st.session_state.session_loaded:
+# Load session when button is clicked and data not already loaded
+if st.sidebar.button("Load Race Session") and st.session_state.session is None:
     session = load_session(year, race_name, event_type)
     if session:
+        # Store session in session_state to persist data across reruns
         st.session_state.session = session
-        st.session_state.session_loaded = True  # Mark as loaded
-        st.stop()  # Prevent rerun after loading data
 
-# If session is loaded
+# If session is loaded, retrieve and plot
 if st.session_state.session:
     session = st.session_state.session
 
