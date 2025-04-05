@@ -14,7 +14,6 @@ event_type = st.sidebar.selectbox("Event Type", ["FP1", "FP2", "FP3", "Q", "R"])
 
 # Load session from API
 def load_session(year, race_name, event_type):
-    fastf1.Cache.enable_cache(None)  # Disable cache (no caching mechanism)
     schedule = fastf1.get_event_schedule(year)
     race = schedule[schedule['EventName'].str.contains(race_name, case=False, na=False)]
 
@@ -130,14 +129,13 @@ def plot_track(session, driver_lap_map):
 if "session" not in st.session_state:
     st.session_state.session = None
 
-# Load session when button is clicked and data not already loaded
-if st.sidebar.button("Load Race Session") and st.session_state.session is None:
+# Load button
+if st.sidebar.button("Load Race Session"):
     session = load_session(year, race_name, event_type)
     if session:
-        # Store session in session_state to persist data across reruns
         st.session_state.session = session
 
-# If session is loaded, retrieve and plot
+# If session is loaded
 if st.session_state.session:
     session = st.session_state.session
 
