@@ -1,0 +1,21 @@
+# Ignore cache directory for FastF1
+f1_cache/
+
+# Ignore Python bytecode files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Ignore environment-specific files
+.env
+.venv
+env/
+venv/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore render-related files
+.render.yaml
