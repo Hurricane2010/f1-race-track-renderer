@@ -5,6 +5,7 @@ import os
 import plotly.graph_objects as go
 import numpy as np
 from plotly.subplots import make_subplots
+import time
 
 # Cache directory
 CACHE_DIR = "f1_cache"
@@ -49,6 +50,19 @@ def load_session(year, race_name, event_type):
         st.success("Fetched from API and cached ✅")
 
     return session
+
+# Function to load session with timeout
+def load_session_with_timeout(year, race_name, event_type, timeout=30):
+    try:
+        start_time = time.time()
+        session = load_session(year, race_name, event_type)
+        elapsed_time = time.time() - start_time
+        if elapsed_time > timeout:
+            st.warning(f"Warning: Data loading took {elapsed_time:.2f} seconds.")
+        return session
+    except Exception as e:
+        st.error(f"Error loading session: {e}")
+        return None
 
 # Plotting function with selected lap
 def plot_track(session, driver_lap_map):
@@ -154,16 +168,19 @@ def plot_track(session, driver_lap_map):
 if "session" not in st.session_state:
     st.session_state.session = None
 
+if "session_loaded" not in st.session_state:
+    st.session_state.session_loaded = False
+
 # Load button
-if st.sidebar.button("Load Race Session"):
-    session = load_session(year, race_name, event_type)
+if st.sidebar.button("Load Race Session") and not st.session_state.session_loaded:
+    session = load_session_with_timeout(year, race_name, event_type)
     if session:
         st.session_state.session = session
+        st.session_state.session_loaded = True  # Mark as loaded
 
-# If session is loaded
+# Check if session is loaded
 if st.session_state.session:
     session = st.session_state.session
-
     all_drivers = session.laps['Driver'].unique().tolist()
     selected_drivers = st.sidebar.multiselect("Select Drivers", all_drivers, default=all_drivers[:2])
 
