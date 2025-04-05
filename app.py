@@ -1,14 +1,8 @@
 import streamlit as st
 import fastf1
-import pickle
-import os
 import plotly.graph_objects as go
 import numpy as np
 from plotly.subplots import make_subplots
-
-# Cache directory
-CACHE_DIR = "f1_cache"
-os.makedirs(CACHE_DIR, exist_ok=True)
 
 st.title("F1 Race Track Renderer")
 st.sidebar.header("Race Selection")
@@ -18,23 +12,9 @@ year = st.sidebar.number_input("Year", min_value=2018, max_value=2025, value=202
 race_name = st.sidebar.text_input("Race Name (e.g., Italian Grand Prix)", "Italian Grand Prix")
 event_type = st.sidebar.selectbox("Event Type", ["FP1", "FP2", "FP3", "Q", "R"])
 
-# Cache filename function
-def get_cache_filename(year, race_name, event_type):
-    safe_race_name = race_name.replace(" ", "_").lower()
-    return os.path.join(CACHE_DIR, f"{year}_{safe_race_name}_{event_type}.pkl")
-
-# Load session from cache or API
+# Load session from API
 def load_session(year, race_name, event_type):
-    cache_file = get_cache_filename(year, race_name, event_type)
-
-    # Check cache first
-    if os.path.exists(cache_file):
-        with open(cache_file, "rb") as f:
-            st.success("Loaded from cache ✅")
-            return pickle.load(f)
-
-    # Fetch from API if not cached
-    fastf1.Cache.enable_cache(CACHE_DIR)
+    fastf1.Cache.enable_cache(None)  # Disable cache (no caching mechanism)
     schedule = fastf1.get_event_schedule(year)
     race = schedule[schedule['EventName'].str.contains(race_name, case=False, na=False)]
 
@@ -45,11 +25,6 @@ def load_session(year, race_name, event_type):
     round_number = race['RoundNumber'].values[0]
     session = fastf1.get_session(year, round_number, event_type)
     session.load()
-
-    # Cache the session data
-    with open(cache_file, "wb") as f:
-        pickle.dump(session, f)
-        st.success("Fetched from API and cached ✅")
 
     return session
 
