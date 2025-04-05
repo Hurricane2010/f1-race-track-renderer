@@ -137,20 +137,18 @@ def plot_track(session, driver_lap_map):
             xanchor="center",
             y=-0.2,
             yanchor="top",
-            buttons=[
-                dict(
-                    args=[None, {"frame": {"duration": 0, "redraw": False}, "mode": "immediate"}],
-                    label="Play",
-                    method="animate"
-                )
-            ]
+            buttons=[dict(
+                args=[None, {"frame": {"duration": 0, "redraw": False}, "mode": "immediate"}],
+                label="Play",
+                method="animate"
+            )]
         )],
     )
 
     fig.frames = frames
     return fig
 
-# Initialize session state
+# Initialize session state if not already initialized
 if "session" not in st.session_state:
     st.session_state.session = None
     st.session_state.session_loaded = False  # Add flag to track if session is loaded
