@@ -16,7 +16,7 @@ An interactive Formula 1 race track visualizer built with Streamlit and FastF1. 
 
 ## Live Demo
 
-Deployed on Streamlit: *[(add your Render URL here once deployed)](https://f1track.streamlit.app/)*
+Deployed on Streamlit: *[Demo)](https://f1track.streamlit.app/)*
 <img width="2880" height="1510" alt="image" src="https://github.com/user-attachments/assets/78706dd6-2ed6-4bc9-9655-d21262f0e4eb" />
 
 ---
